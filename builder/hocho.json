@@ -26,30 +26,30 @@
       ]
     },
     {
-			"type": "shell",
-			"inline": [
-				"systemctl set-default multi-user.target",
-				"ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service",
-				"cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << EOF"
-			]
-},
-			{
-				"type": "file",
-				"source": "data/boot/config.txt",
-				"destination": "/boot/config.txt"
-			},
-			{
-				"type": "file",
-				"source": "data/etc/network/interfaces.d/wlan0-cfg",
-				"destination": "/etc/network/interfaces.d/wlan0-cfg"
-			},
-			{
-				"type": "shell",
-				"inline": [
-					"sed '/PasswordAuthentication/d' -i /etc/ssh/sshd_config",
-					"echo  >> /etc/ssh/sshd_config",
-					"echo 'PasswordAuthentication no' >> /etc/ssh/sshd_config"
-			]
-			}
-	]
-		}
+      "type": "shell",
+      "inline": [
+        "systemctl set-default multi-user.target",
+        "ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service",
+        "cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << EOF"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "data/boot/config.txt",
+      "destination": "/boot/config.txt"
+    },
+    {
+      "type": "file",
+      "source": "data/etc/network/interfaces.d/wlan0-cfg",
+      "destination": "/etc/network/interfaces.d/wlan0-cfg"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sed '/PasswordAuthentication/d' -i /etc/ssh/sshd_config",
+        "echo  >> /etc/ssh/sshd_config",
+        "echo 'PasswordAuthentication no' >> /etc/ssh/sshd_config"
+      ]
+    }
+  ]
+}
