@@ -6,8 +6,15 @@ PACKER_VERSION=1.5.2
 USER=$(shell whoami)
 FILE_NAME=$(NAME)-raspbian-lite-$(VERS)
 
+WIFI_NAME:=$(shell cat password | jq .name -r)
+WIFI_PASS:=$(shell cat password | jq .password -r)
+
 
 .PHONY: all install clean apt-deps
+
+pass: password
+	@echo $(WIFI_NAME)
+	@echo $(WIFI_PASS)
 
 all: clean install image
 
@@ -36,7 +43,10 @@ apt-deps:
 
 
 image:
-	cd builder && sudo /usr/bin/packer build -var "pwn_hostname=$(NAME)" -var "pwn_version=$(VERS)" hocho.json
+	cd builder && sudo /usr/bin/packer build \
+		-var wifi_name="$(WIFI_NAME)" \
+		-var wifi_pass="$(WIFI_PASS)" \
+		hocho.json
 	mkdir -p dist/$(FILE_NAME)
 	sudo mv builder/output-$(NAME)/image dist/$(FILE_NAME)/$(FILE_NAME).img
 	sudo chown -R $(USER): dist

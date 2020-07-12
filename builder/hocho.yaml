@@ -1,0 +1,47 @@
+---
+- hosts:
+    - 127.0.0.1
+  become: yes
+  vars:
+    pwnagotchi:
+      hostname: "{{ lookup('env', 'PWN_HOSTNAME') | default('pwnagotchi', true) }}"
+      version: "{{ lookup('env', 'PWN_VERSION') | default('master', true) }}"
+    system:
+      boot:
+    services:
+      enable:
+        - ifup@wlan0.service
+    packages:
+      apt:
+        install:
+          - screen
+
+  tasks:
+
+    - name: update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: upgrade apt distro
+      apt:
+        upgrade: dist
+
+    - name: install packages
+      apt:
+        name: "{{ packages.apt.install }}"
+        state: present
+
+    - name: clean apt cache
+      apt:
+        autoclean: yes
+
+    - name: remove dependencies that are no longer required
+      apt:
+        autoremove: yes
+
+    - name: enable services
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      with_items: "{{ services.enable }}"

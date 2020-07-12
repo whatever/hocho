@@ -1,7 +1,7 @@
 {
   "variables": {
-    "wifi_name": "lothlorien",
-    "wifi_password": "fuck yeah",
+    "wifi_name": "{{env `WIFI_NAME`}}",
+    "wifi_pass": "{{env `WIFI_PASS`}}",
     "home": "{{env `HOME`}}"
   },
   "builders": [
@@ -17,12 +17,21 @@
   "provisioners": [
     {
       "type": "shell",
+      "inline": [
+        "sed -i 's/^\\([^#]\\)/#\\1/g' /etc/ld.so.preload",
+        "dpkg-architecture",
+        "apt-get -y update",
+        "apt-get install -y ansible"
+      ]
+    },
+    {
+      "type": "shell",
       "inline": ["touch /boot/ssh"]
     },
     {
       "type": "shell",
       "inline": [
-        "wpa_passphrase \"{{user `wifi_name`}}\" \"{{user `wifi_password`}}\" | sed -e 's/#.*$//' -e '/^$/d' >> /etc/wpa_supplicant/wpa_supplicant.conf"
+        "wpa_passphrase \"{{user `wifi_name`}}\" \"{{user `wifi_pass`}}\" | sed -e 's/#.*$//' -e '/^$/d' >> /etc/wpa_supplicant/wpa_supplicant.conf"
       ]
     },
     {
@@ -46,10 +55,27 @@
     {
       "type": "shell",
       "inline": [
+        "rfkill unblock all"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
         "sed '/PasswordAuthentication/d' -i /etc/ssh/sshd_config",
         "echo  >> /etc/ssh/sshd_config",
         "echo 'PasswordAuthentication no' >> /etc/ssh/sshd_config"
       ]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "hocho.yml",
+      "extra_arguments": [ "--extra-vars \"ansible_python_interpreter=/usr/bin/python3\"" ],
+      "command": "ANSIBLE_FORCE_COLOR=1 PYTHONUNBUFFERED=1  ansible-playbook"
+    },
+    {
+      "type": "file",
+      "source": "etc/motd",
+      "destination": "/etc/motd"
     }
   ]
 }
