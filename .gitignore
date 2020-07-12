@@ -1,3 +1,4 @@
+scripts
 builder/output-*
 dist
 packer_cache
